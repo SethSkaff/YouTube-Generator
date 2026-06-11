@@ -1,0 +1,18 @@
+# Per-project assets generated during a run — keep the template clean
+script_images/
+output/
+thumbnail.png
+prompts_*.txt
+*_report.txt
+concat.txt
+audit_pngs.py
+__pycache__/
+
+# Audio inputs (your narration goes here, never committed)
+*.m4a
+*.m4b
+*.mp3
+*.wav
+*.aac
+*.flac
+*.ogg
