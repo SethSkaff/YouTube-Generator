@@ -1,15 +1,18 @@
 {
+  "$schema": "https://json.schemastore.org/claude-code-marketplace-manifest.json",
   "name": "youtube-generator",
-  "owner": { "name": "SethSkaff" },
-  "metadata": {
-    "description": "Autonomous script-to-video generator (MS Paint stickman explainer style).",
-    "version": "1.0.0"
+  "owner": {
+    "name": "SethSkaff",
+    "url": "https://github.com/SethSkaff"
   },
+  "description": "The youtube-generator skill, installable as a Claude Code plugin.",
   "plugins": [
     {
       "name": "youtube-generator",
-      "source": ".",
-      "description": "Turn a timestamped script into a finished video. /longform = 16:9, /shortform = 9:16."
+      "source": "./",
+      "description": "Turn a timestamped script into a finished MS Paint stickman explainer video. /longform = 16:9, /shortform = 9:16.",
+      "license": "MIT",
+      "keywords": ["video", "youtube", "shorts", "automation", "chatgpt", "ffmpeg", "stickman"]
     }
   ]
 }
