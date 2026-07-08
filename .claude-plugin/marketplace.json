@@ -1,0 +1,15 @@
+{
+  "name": "youtube-generator",
+  "owner": { "name": "SethSkaff" },
+  "metadata": {
+    "description": "Autonomous script-to-video generator (MS Paint stickman explainer style).",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "youtube-generator",
+      "source": ".",
+      "description": "Turn a timestamped script into a finished video. /longform = 16:9, /shortform = 9:16."
+    }
+  ]
+}

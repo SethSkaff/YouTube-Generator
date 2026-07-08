@@ -1,0 +1,7 @@
+{
+  "name": "youtube-generator",
+  "description": "Turn a timestamped script into a finished MS Paint stickman explainer video. Use /longform for a horizontal 16:9 YouTube video or /shortform for a vertical 9:16 Short/Reel.",
+  "version": "1.0.0",
+  "author": { "name": "SethSkaff" },
+  "keywords": ["video", "youtube", "shorts", "automation", "chatgpt", "ffmpeg"]
+}

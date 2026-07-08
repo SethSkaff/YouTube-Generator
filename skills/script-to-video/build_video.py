@@ -1,15 +1,21 @@
-"""Assemble script_images/*.png into a timed video synced to the audio file in this folder.
-Self-detecting: finds the images, finds the audio (longest audio file in this folder), renders to output/.
-Run: python build_video.py
+"""Assemble script_images/*.png (in the CURRENT project folder) into a timed video
+synced to the audio file in that folder.
+
+Aspect ratio via argv[1]: "16:9" (default, 1920x1080) or "9:16" (1080x1920).
+Run from inside the project folder:  python build_video.py 16:9
 """
-import os, re, glob, subprocess
+import os, re, glob, subprocess, sys
 import imageio_ffmpeg
 
-HERE   = os.path.dirname(os.path.abspath(__file__))
-FFMPEG = imageio_ffmpeg.get_ffmpeg_exe()
+ASPECT = (sys.argv[1] if len(sys.argv) > 1 else "16:9").replace(" ", "")
+W, H = (1080, 1920) if ASPECT == "9:16" else (1920, 1080)
+
+HERE    = os.getcwd()
+FFMPEG  = imageio_ffmpeg.get_ffmpeg_exe()
 IMG_DIR = os.path.join(HERE, "script_images")
 OUTDIR  = os.path.join(HERE, "output")
 os.makedirs(OUTDIR, exist_ok=True)
+print(f"Aspect {ASPECT} -> {W}x{H}")
 
 def duration(path):
     p = subprocess.run([FFMPEG, "-i", path], capture_output=True, text=True)
@@ -18,8 +24,8 @@ def duration(path):
     h, mn, s = m.groups()
     return int(h)*3600 + int(mn)*60 + float(s)
 
-# --- find the audio file (longest of any common audio type in this folder)
-AUDIO_EXTS = ("*.m4a","*.mp3","*.wav","*.aac","*.m4b","*.flac","*.ogg")
+# --- find the audio file (longest audio of any common type in this folder)
+AUDIO_EXTS = ("*.m4a","*.m4b","*.mp3","*.wav","*.aac","*.flac","*.ogg")
 cands = []
 for ext in AUDIO_EXTS:
     cands += glob.glob(os.path.join(HERE, ext))
@@ -41,7 +47,7 @@ print(f"Images: {len(items)}")
 if not items:
     raise SystemExit("No images found in script_images/.")
 
-# --- concat list with per-image durations (last image runs to end of audio; repeat last entry)
+# --- concat list (last image runs to end of audio; repeat last entry so its duration applies)
 concat_path = os.path.join(OUTDIR, "concat.txt")
 with open(concat_path, "w", encoding="utf-8") as f:
     for i, (secs, path) in enumerate(items):
@@ -50,12 +56,12 @@ with open(concat_path, "w", encoding="utf-8") as f:
         f.write(f"duration {max(0.1, end-secs):.3f}\n")
     f.write(f"file '{items[-1][1].replace(chr(92), '/')}'\n")
 
-VF = ("scale=1920:1080:force_original_aspect_ratio=decrease,"
-      "pad=1920:1080:(ow-iw)/2:(oh-ih)/2:white,format=yuv420p")
+VF = (f"scale={W}:{H}:force_original_aspect_ratio=decrease,"
+      f"pad={W}:{H}:(ow-iw)/2:(oh-ih)/2:white,format=yuv420p")
 silent = os.path.join(OUTDIR, "slideshow_visuals_silent.mp4")
 final  = os.path.join(OUTDIR, "final_video_with_audio.mp4")
 
-# CFR conversion on the OUTPUT side (-fps_mode cfr -r 30) — NOT fps=30 in the filter (drops first frame)
+# CFR on the OUTPUT side (-fps_mode cfr -r 30) — never fps=30 in the filter (drops the first frame)
 print("Rendering silent visuals...")
 r1 = subprocess.run([FFMPEG,"-y","-f","concat","-safe","0","-i",concat_path,
         "-vf",VF,"-fps_mode","cfr","-r","30","-c:v","libx264","-preset","medium","-crf","20",silent],
